@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ma Sói Online - Bạn Bè</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin-top: 50px;
+      }
+      .container {
+        max-width: 400px;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+      }
+      input,
+      button {
+        width: 90%;
+        margin: 10px 0;
+        padding: 10px;
+      }
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>🐺 Làng Ma Sói</h2>
+
+      <div id="login-section">
+        <h3>Đăng Nhập</h3>
+        <input type="text" id="login-username" placeholder="Tài khoản" />
+        <input type="password" id="login-password" placeholder="Mật khẩu" />
+        <button onclick="login()">Đăng Nhập</button>
+        <p>
+          Chưa có tài khoản?
+          <a href="#" onclick="toggleSection('register-section')"
+            >Đăng ký ngay</a
+          >
+        </p>
+      </div>
+
+      <div id="register-section" class="hidden">
+        <h3>Đăng Ký</h3>
+        <input type="text" id="reg-username" placeholder="Tài khoản mới" />
+        <input type="password" id="reg-password" placeholder="Mật khẩu mới" />
+        <button onclick="register()">Đăng Ký</button>
+        <p>
+          Đã có tài khoản?
+          <a href="#" onclick="toggleSection('login-section')"
+            >Quay lại đăng nhập</a
+          >
+        </p>
+      </div>
+
+      <div id="character-section" class="hidden">
+        <h3>Tạo Tên Nhân Vật</h3>
+        <p>Tên này sẽ hiển thị trong game và dùng để kết bạn.</p>
+        <input type="text" id="char-name" placeholder="Ví dụ: SoiCa99" />
+        <button onclick="createCharacter()">Xác nhận</button>
+      </div>
+
+      <div id="lobby-section" class="hidden">
+        <h3 id="welcome-text">Chào mừng!</h3>
+        <button onclick="showFriendsSection()">🤝 Bạn Bè</button>
+        <button onclick="showRoomSection()">🏠 Tạo / Vào Phòng</button>
+        <button onclick="showCardDictionary()">🃏 Từ Điển Ma Sói</button>
+      </div>
+      <div id="card-dictionary-section" class="hidden">
+        <h3>📖 Từ Điển Các Lá Bài</h3>
+
+        <div
+          id="dictionary-list"
+          style="
+            text-align: left;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+          "
+        ></div>
+
+        <button
+          onclick="
+            showLobby(JSON.parse(localStorage.getItem('user')).characterName)
+          "
+          style="background-color: #ccc; color: black; margin-top: 15px"
+        >
+          ⬅ Quay lại Sảnh
+        </button>
+      </div>
+      <div id="friends-section" class="hidden">
+        <h3>🤝 Danh Sách Bạn Bè</h3>
+        <ul
+          id="friends-list"
+          style="list-style-type: none; padding: 0; margin-bottom: 20px"
+        ></ul>
+        <input
+          type="text"
+          id="search-friend-name"
+          placeholder="Nhập tên nhân vật cần tìm..."
+        />
+        <button onclick="addFriend()">Kết Bạn</button>
+        <br />
+        <button
+          onclick="
+            showLobby(JSON.parse(localStorage.getItem('user')).characterName)
+          "
+          style="background-color: #ccc; color: black"
+        >
+          ⬅ Quay lại Sảnh
+        </button>
+      </div>
+
+      <div id="room-selection-section" class="hidden">
+        <h3>🏠 Chọn Phòng</h3>
+        <button
+          onclick="createRoom()"
+          style="background-color: #4caf50; color: white"
+        >
+          Tạo Phòng Mới
+        </button>
+        <hr style="margin: 20px 0" />
+        <input
+          type="text"
+          id="room-code-input"
+          placeholder="Nhập mã phòng (VD: 1234)"
+        />
+        <button onclick="joinRoom()">Vào Phòng</button>
+        <br />
+        <button
+          onclick="
+            showLobby(JSON.parse(localStorage.getItem('user')).characterName)
+          "
+          style="background-color: #ccc; color: black"
+        >
+          ⬅ Quay lại Sảnh
+        </button>
+      </div>
+
+      <div id="in-room-section" class="hidden">
+        <h3>
+          Mã Phòng:
+          <span
+            id="current-room-code"
+            style="color: #e74c3c; font-size: 24px"
+          ></span>
+        </h3>
+        <h4>Người chơi trong phòng:</h4>
+        <ul
+          id="players-in-room"
+          style="list-style-type: none; padding: 0; margin-bottom: 20px"
+        ></ul>
+
+        <div
+          id="host-controls"
+          style="
+            display: none;
+            margin: 15px 0;
+            padding: 15px;
+            border: 1px dashed #e74c3c;
+            border-radius: 8px;
+          "
+        >
+          <h4>⚙️ Cài Đặt Game</h4>
+
+          <label>
+            <input
+              type="radio"
+              name="game-mode"
+              value="random"
+              checked
+              onchange="toggleMode()"
+            />
+            🎲 Máy tự chia (Cân bằng)
+          </label>
+          <br />
+          <label style="margin-top: 10px; display: inline-block">
+            <input
+              type="radio"
+              name="game-mode"
+              value="custom"
+              onchange="toggleMode()"
+            />
+            ✍️ Tự chọn bài
+          </label>
+
+          <div
+            id="custom-mode-ui"
+            class="hidden"
+            style="
+              margin-top: 15px;
+              text-align: left;
+              max-height: 250px;
+              overflow-y: auto;
+            "
+          >
+            <ul
+              id="card-selection-list"
+              style="list-style: none; padding: 0"
+            ></ul>
+          </div>
+        </div>
+
+        <button
+          id="start-game-btn"
+          onclick="startGame()"
+          style="background-color: #e74c3c; color: white; display: none"
+        >
+          🔥 Bắt Đầu Game
+        </button>
+        <button onclick="leaveRoom()">Rời Phòng</button>
+      </div>
+    </div>
+    <div id="role-reveal-section" class="hidden">
+      <h3>🃏 Lá bài của bạn là:</h3>
+      <div
+        style="
+          border: 2px solid #333;
+          border-radius: 10px;
+          padding: 20px;
+          margin: 20px auto;
+          max-width: 250px;
+          background-color: #f9f9f9;
+        "
+      >
+        <h2 id="role-name" style="color: #e74c3c; margin-top: 0">
+          Tên Vai Trò
+        </h2>
+        <h4 id="role-team" style="color: #2980b9">Phe: ...</h4>
+        <p id="role-desc" style="font-size: 14px; color: #555">
+          Mô tả chức năng...
+        </p>
+      </div>
+      <p style="color: red; font-weight: bold">
+        🤫 Giữ bí mật thân phận của mình nhé!
+      </p>
+
+      <button
+        id="play-again-btn"
+        onclick="playAgain()"
+        style="display: none; background-color: #4caf50; color: white"
+      >
+        🔄 Chơi Ván Mới
+      </button>
+      <button onclick="leaveRoom()">🚪 Thoát Khỏi Phòng</button>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>
