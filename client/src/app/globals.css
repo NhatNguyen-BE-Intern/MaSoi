@@ -1,0 +1,327 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg-primary: #07090e;
+  --bg-secondary: #0f131d;
+  --bg-card: rgba(20, 24, 38, 0.72);
+  --bg-card-hover: rgba(28, 34, 52, 0.85);
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-glass-glow: rgba(220, 53, 69, 0.35);
+
+  --color-wolf: #ff3355;
+  --color-wolf-glow: rgba(255, 51, 85, 0.45);
+  --color-villager: #10b981;
+  --color-villager-glow: rgba(16, 185, 129, 0.4);
+  --color-seer: #a855f7;
+  --color-seer-glow: rgba(168, 85, 247, 0.4);
+  --color-guard: #f59e0b;
+  --color-guard-glow: rgba(245, 158, 11, 0.4);
+  --color-moderator: #ec4899;
+
+  --gold-accent: #d4af37;
+  --gold-glow: rgba(212, 175, 55, 0.3);
+
+  --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+
+  --font-heading: 'Cinzel', serif;
+  --font-body: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+  user-select: none;
+  position: relative;
+}
+
+/* GPU-Accelerated Fixed Background (Eliminates Scroll Lag & Repaints) */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: 
+    radial-gradient(ellipse at 50% 0%, rgba(155, 17, 30, 0.16) 0%, transparent 65%),
+    radial-gradient(ellipse at 80% 80%, rgba(88, 28, 135, 0.12) 0%, transparent 60%),
+    radial-gradient(circle at 10% 20%, rgba(20, 30, 55, 0.45) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-accent);
+}
+
+/* Typography utilities */
+.font-cinzel {
+  font-family: var(--font-heading);
+}
+
+/* Glassmorphism Card Container (Optimized blur for smooth FPS) */
+.glass-panel {
+  background: rgba(16, 20, 32, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border-glass);
+  border-radius: 20px;
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.glass-panel-glow {
+  box-shadow: 0 0 24px -4px rgba(220, 53, 69, 0.25), 0 12px 32px -8px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  border-color: rgba(220, 53, 69, 0.35);
+}
+
+/* Inputs & Form fields */
+.game-input {
+  width: 100%;
+  padding: 14px 18px;
+  background: rgba(10, 14, 23, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  color: var(--text-main);
+  font-family: var(--font-body);
+  font-size: 15px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.game-input:focus {
+  border-color: var(--gold-accent);
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.25);
+  background: rgba(15, 20, 32, 0.9);
+}
+
+.game-input::placeholder {
+  color: var(--text-dim);
+}
+
+/* Primary Button (Gothic Red/Gold) */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 22px;
+  background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);
+  border: 1px solid rgba(255, 100, 100, 0.3);
+  border-radius: 12px;
+  color: #fff;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px -4px rgba(185, 28, 28, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  text-transform: uppercase;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px -4px rgba(220, 38, 38, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+/* Secondary Button */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 20px;
+  background: rgba(30, 38, 58, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: var(--text-main);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(45, 55, 82, 0.8);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Gold Button */
+.btn-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #d4af37 0%, #aa820a 100%);
+  border: 1px solid rgba(255, 235, 150, 0.4);
+  border-radius: 12px;
+  color: #120e03;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px -3px rgba(212, 175, 55, 0.4);
+  transition: all 0.2s ease;
+}
+
+.btn-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -3px rgba(212, 175, 55, 0.6);
+}
+
+/* ========================================================
+   3D CARD FLIP CONTAINER & ANIMATIONS
+   ======================================================== */
+.card-scene {
+  perspective: 1200px;
+  width: 290px;
+  height: 440px;
+  margin: 0 auto;
+  cursor: pointer;
+}
+
+.card-object {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.65s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border-radius: 18px;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.85);
+  will-change: transform;
+}
+
+.card-object.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+  overflow: hidden;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Back of Card (Shown by Default) */
+.card-face-back {
+  background: #0a0b10;
+  border: 2px solid var(--gold-accent);
+  box-shadow: 0 0 25px var(--gold-glow);
+}
+
+.card-face-back img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Front of Card (Revealed on Flip) */
+.card-face-front {
+  transform: rotateY(180deg);
+  background: #0b0f19;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.card-face-front.team-soi {
+  border-color: var(--color-wolf);
+  box-shadow: 0 0 35px var(--color-wolf-glow);
+}
+
+.card-face-front.team-dan {
+  border-color: var(--color-villager);
+  box-shadow: 0 0 35px var(--color-villager-glow);
+}
+
+.card-face-front.team-seer {
+  border-color: var(--color-seer);
+  box-shadow: 0 0 35px var(--color-seer-glow);
+}
+
+.card-face-front.team-guard {
+  border-color: var(--color-guard);
+  box-shadow: 0 0 35px var(--color-guard-glow);
+}
+
+.card-face-front.team-moderator {
+  border-color: var(--color-moderator);
+  box-shadow: 0 0 35px rgba(236, 72, 153, 0.45);
+}
+
+/* Pulsing Badge & Aura Animations */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(220, 38, 38, 0.8);
+  }
+}
+
+.pulse-red {
+  animation: pulseGlow 2.5s infinite ease-in-out;
+}
+
+/* Blood moon floating effect */
+@keyframes moonFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.floating-element {
+  animation: moonFloat 4s ease-in-out infinite;
+}
+
+/* Mobile responsive fixes */
+@media (max-width: 640px) {
+  .card-scene {
+    width: 260px;
+    height: 395px;
+  }
+}

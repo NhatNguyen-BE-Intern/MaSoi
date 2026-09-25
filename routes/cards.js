@@ -10,7 +10,7 @@ router.get("/", async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ message: "Lỗi server khi lấy danh sách bài", error });
+      .json({ message: "Lỗi server khi lấy danh sách bài", error: error.message });
   }
 });
 
