@@ -33,11 +33,12 @@ app.use("/api/auth", authRoutes);
 app.use("/api/friends", friendRoutes);
 app.use("/api/cards", cardRoutes);
 
-app.get("*", (req, res, next) => {
-  if (req.path.startsWith("/api") || req.path.startsWith("/socket.io")) {
-    return next();
+// Fallback phục vụ giao diện Next.js SPA
+app.use((req, res, next) => {
+  if (req.method === "GET" && !req.path.startsWith("/api") && !req.path.startsWith("/socket.io")) {
+    return res.sendFile(path.join(__dirname, "public", "index.html"));
   }
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  next();
 });
 
 // --- XỬ LÝ REALTIME (SOCKET.IO) ---
