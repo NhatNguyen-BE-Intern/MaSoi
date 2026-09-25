@@ -49,6 +49,21 @@ const roomGameData = {};
 const disconnectGraceTimers = new Map(); // key: `${roomCode}_${characterName}`, value: timerId
 const roomEmptyCleanupTimers = new Map(); // key: roomCode, value: timerId
 
+function sanitizeCard(c) {
+  if (!c) return null;
+  const raw = typeof c.toObject === "function" ? c.toObject() : (c._doc || c);
+  return {
+    _id: raw._id ? raw._id.toString() : undefined,
+    name: String(raw.name || "Dân Làng").trim(),
+    team: String(raw.team || "Dân").trim(),
+    description: String(
+      raw.description ||
+        "Ngủ say vào ban đêm. Ban ngày cùng thảo luận và biểu quyết treo cổ Ma Sói.",
+    ).trim(),
+    isSpecial: !!raw.isSpecial,
+  };
+}
+
 function generateNightOrder(deckRoles) {
   const roleNames = deckRoles
     .map((r) => (r && r.name ? r.name.toLowerCase().trim() : ""))
@@ -217,8 +232,9 @@ io.on("connection", (socket) => {
         );
         if (inGamePlayer) {
           inGamePlayer.socketId = socket.id;
+          const cleanRole = sanitizeCard(inGamePlayer.role);
           socket.emit("receive_role", {
-            ...inGamePlayer.role,
+            ...cleanRole,
             isAlive: inGamePlayer.isAlive !== undefined ? inGamePlayer.isAlive : true,
             isModerator: false,
             roomCode,
@@ -277,22 +293,25 @@ io.on("connection", (socket) => {
     let deck = [];
     let allCards = [];
     try {
-      allCards = await Card.find({});
+      allCards = await Card.find({}).lean();
     } catch (err) {
       console.error("Lỗi lấy danh sách bài từ DB:", err);
     }
 
     // Fallback nếu database chưa có đủ dữ liệu
-    const defaultWolf = allCards.find((c) => c.name === "Ma Sói (Thường)") ||
-      allCards.find((c) => c.team === "Sói") || {
-        _id: "wolf_default",
-        name: "Ma Sói (Thường)",
-        team: "Sói",
-        description: "Mỗi đêm thức dậy cùng bầy sói chọn 1 người dân để cắn.",
-        isSpecial: true,
-      };
+    const foundWolf =
+      allCards.find((c) => c.name === "Ma Sói (Thường)") ||
+      allCards.find((c) => c.team === "Sói");
+    const defaultWolf = sanitizeCard(foundWolf) || {
+      _id: "wolf_default",
+      name: "Ma Sói (Thường)",
+      team: "Sói",
+      description: "Mỗi đêm thức dậy cùng bầy sói chọn 1 người dân để cắn.",
+      isSpecial: true,
+    };
 
-    const defaultVillager = allCards.find((c) => c.name === "Dân Làng") || {
+    const foundVillager = allCards.find((c) => c.name === "Dân Làng");
+    const defaultVillager = sanitizeCard(foundVillager) || {
       _id: "villager_default",
       name: "Dân Làng",
       team: "Dân",
@@ -300,7 +319,8 @@ io.on("connection", (socket) => {
       isSpecial: false,
     };
 
-    const defaultSeer = allCards.find((c) => c.name === "Tiên Tri") || {
+    const foundSeer = allCards.find((c) => c.name === "Tiên Tri");
+    const defaultSeer = sanitizeCard(foundSeer) || {
       _id: "seer_default",
       name: "Tiên Tri",
       team: "Dân",
@@ -308,7 +328,8 @@ io.on("connection", (socket) => {
       isSpecial: true,
     };
 
-    const defaultGuard = allCards.find((c) => c.name === "Bảo Vệ") || {
+    const foundGuard = allCards.find((c) => c.name === "Bảo Vệ");
+    const defaultGuard = sanitizeCard(foundGuard) || {
       _id: "guard_default",
       name: "Bảo Vệ",
       team: "Dân",
@@ -321,10 +342,13 @@ io.on("connection", (socket) => {
       for (const [cardId, count] of Object.entries(customDeck)) {
         const num = Math.max(0, Math.min(50, Math.floor(Number(count) || 0)));
         if (num > 0) {
-          const cardInfo = allCards.find((c) => c._id.toString() === cardId);
+          const cardInfo = allCards.find(
+            (c) => c._id && c._id.toString() === cardId.toString(),
+          );
           if (cardInfo) {
+            const clean = sanitizeCard(cardInfo);
             for (let i = 0; i < num; i++) {
-              deck.push(cardInfo);
+              deck.push(clean);
               totalSelected++;
             }
           }
@@ -359,7 +383,7 @@ io.on("connection", (socket) => {
     const dealtPlayers = playersToDeal.map((p, index) => ({
       characterName: p.characterName,
       socketId: p.socketId,
-      role: deck[index],
+      role: sanitizeCard(deck[index]),
       isAlive: true,
     }));
 
@@ -367,7 +391,7 @@ io.on("connection", (socket) => {
     const uniqueCardsMap = new Map();
     deck.forEach((c) => {
       if (c && c.name && !uniqueCardsMap.has(c.name)) {
-        uniqueCardsMap.set(c.name, c);
+        uniqueCardsMap.set(c.name, sanitizeCard(c));
       }
     });
     const cardsInGame = Array.from(uniqueCardsMap.values());

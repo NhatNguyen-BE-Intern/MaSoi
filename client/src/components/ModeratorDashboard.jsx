@@ -286,10 +286,27 @@ export default function ModeratorDashboard({
           {/* Players list */}
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             {players.map((p) => {
+              const roleObj =
+                p.role?._doc && typeof p.role._doc === "object"
+                  ? { ...p.role._doc, ...p.role }
+                  : p.role || {};
+              const roleName = roleObj.name || "Dân Làng";
+              const roleTeam = roleObj.team || "Dân";
+
               const isWolfRole =
-                p.role && (p.role.team === "Sói" || p.role.name.includes("Sói"));
-              const isSeerRole = p.role?.name?.includes("Tiên Tri");
-              const isGuardRole = p.role?.name?.includes("Bảo Vệ");
+                roleTeam === "Sói" ||
+                roleName.toLowerCase().includes("sói") ||
+                roleName.toLowerCase().includes("wolf");
+              const isSeerRole =
+                roleName.toLowerCase().includes("tiên tri") ||
+                roleName.toLowerCase().includes("seer");
+              const isGuardRole =
+                roleName.toLowerCase().includes("bảo vệ") ||
+                roleName.toLowerCase().includes("guard");
+              const isNeutralRole =
+                roleTeam === "Trung lập" ||
+                roleTeam === "Phe thứ 3" ||
+                roleTeam.toLowerCase().includes("trung lập");
 
               const badgeColor = isWolfRole
                 ? "var(--color-wolf)"
@@ -297,6 +314,8 @@ export default function ModeratorDashboard({
                 ? "var(--color-seer)"
                 : isGuardRole
                 ? "var(--color-guard)"
+                : isNeutralRole
+                ? "#a855f7"
                 : "var(--color-villager)";
 
               return (
@@ -369,7 +388,7 @@ export default function ModeratorDashboard({
                   {/* Role Name & Info Trigger */}
                   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                     <button
-                      onClick={() => setSelectedCardInfo(p.role)}
+                      onClick={() => setSelectedCardInfo(roleObj)}
                       style={{
                         padding: "4px 10px",
                         borderRadius: "6px",
@@ -385,7 +404,7 @@ export default function ModeratorDashboard({
                       }}
                       title="Xem chức năng lá bài này"
                     >
-                      <span>{p.role?.name || "Dân Làng"}</span>
+                      <span>{roleName}</span>
                       <RiQuestionLine size={13} />
                     </button>
                   </div>

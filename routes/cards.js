@@ -5,7 +5,7 @@ const Card = require("../models/Card");
 // API lấy toàn bộ danh sách lá bài từ Database
 router.get("/", async (req, res) => {
   try {
-    const cards = await Card.find({});
+    const cards = await Card.find({}).lean();
     res.status(200).json(cards);
   } catch (error) {
     res

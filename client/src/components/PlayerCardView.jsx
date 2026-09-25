@@ -26,7 +26,16 @@ export default function PlayerCardView({
   isAlive = true,
 }) {
   const [isFlipped, setIsFlipped] = useState(false);
-  const playerAlive = role?.isAlive !== undefined ? role.isAlive : isAlive;
+  const cardData =
+    role?._doc && typeof role._doc === "object"
+      ? { ...role._doc, ...role }
+      : role || {};
+  const playerAlive = cardData.isAlive !== undefined ? cardData.isAlive : isAlive;
+  const roleName = cardData.name || "Dân Làng";
+  const roleTeam = cardData.team || "Dân";
+  const roleDesc =
+    cardData.description ||
+    "Ngủ say vào ban đêm. Ban ngày cùng thảo luận và biểu quyết treo cổ Ma Sói.";
 
   // Play flip sound whenever flipped
   const handleToggleFlip = () => {
@@ -35,17 +44,27 @@ export default function PlayerCardView({
   };
 
   const getCardImage = () => {
-    if (!role?.name) return "/cards/villager.jpg";
-    const name = role.name.toLowerCase();
+    const name = (roleName || "").toLowerCase();
     if (name.includes("sói") || name.includes("wolf")) return "/cards/werewolf.jpg";
     if (name.includes("tiên tri") || name.includes("seer")) return "/cards/seer.jpg";
     if (name.includes("bảo vệ") || name.includes("guard")) return "/cards/guard.jpg";
     return "/cards/villager.jpg";
   };
 
-  const isWolf = role?.team === "Sói" || role?.name?.includes("Sói");
-  const isSeer = role?.name?.includes("Tiên Tri");
-  const isGuard = role?.name?.includes("Bảo Vệ");
+  const isWolf =
+    roleTeam === "Sói" ||
+    roleName.toLowerCase().includes("sói") ||
+    roleName.toLowerCase().includes("wolf");
+  const isSeer =
+    roleName.toLowerCase().includes("tiên tri") ||
+    roleName.toLowerCase().includes("seer");
+  const isGuard =
+    roleName.toLowerCase().includes("bảo vệ") ||
+    roleName.toLowerCase().includes("guard");
+  const isNeutral =
+    roleTeam === "Trung lập" ||
+    roleTeam === "Phe thứ 3" ||
+    roleTeam.toLowerCase().includes("trung lập");
 
   const teamClass = isWolf
     ? "team-soi"
@@ -53,6 +72,8 @@ export default function PlayerCardView({
     ? "team-seer"
     : isGuard
     ? "team-guard"
+    : isNeutral
+    ? "team-neutral"
     : "team-dan";
 
   const teamColor = isWolf
@@ -61,6 +82,8 @@ export default function PlayerCardView({
     ? "var(--color-seer)"
     : isGuard
     ? "var(--color-guard)"
+    : isNeutral
+    ? "#a855f7"
     : "var(--color-villager)";
 
   return (
@@ -239,7 +262,7 @@ export default function PlayerCardView({
             >
               <img
                 src={getCardImage()}
-                alt={role?.name || "Lá bài"}
+                alt={roleName}
                 style={{
                   width: "100%",
                   height: "100%",
@@ -264,7 +287,7 @@ export default function PlayerCardView({
                   letterSpacing: "0.5px",
                 }}
               >
-                {!playerAlive ? "💀 Hồn Ma" : `Phe ${role?.team || "Dân"}`}
+                {!playerAlive ? "💀 Hồn Ma" : `Phe ${roleTeam}`}
               </div>
             </div>
 
@@ -290,7 +313,7 @@ export default function PlayerCardView({
                     marginBottom: "8px",
                   }}
                 >
-                  {role?.name || "Dân Làng"}
+                  {roleName}
                 </h3>
                 <p
                   style={{
@@ -301,7 +324,7 @@ export default function PlayerCardView({
                     overflowY: "auto",
                   }}
                 >
-                  {role?.description || "Không có mô tả chức năng."}
+                  {roleDesc}
                 </p>
               </div>
 

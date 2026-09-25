@@ -126,9 +126,13 @@ export default function Home() {
         setModeratorData(roleData.moderatorData);
       } else {
         setIsModerator(false);
+        const resolved =
+          roleData?._doc && typeof roleData._doc === "object"
+            ? { ...roleData._doc, ...roleData }
+            : roleData;
         setPlayerRole({
-          ...roleData,
-          isAlive: roleData.isAlive !== undefined ? roleData.isAlive : true,
+          ...resolved,
+          isAlive: resolved?.isAlive !== undefined ? resolved.isAlive : true,
         });
       }
     });
