@@ -3,6 +3,7 @@ const http = require("http");
 const { Server } = require("socket.io");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const path = require("path");
 require("dotenv").config();
 
 const Card = require("./models/Card"); // Load model Card để chia bài
@@ -32,8 +33,11 @@ app.use("/api/auth", authRoutes);
 app.use("/api/friends", friendRoutes);
 app.use("/api/cards", cardRoutes);
 
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/public/index.html");
+app.get("*", (req, res, next) => {
+  if (req.path.startsWith("/api") || req.path.startsWith("/socket.io")) {
+    return next();
+  }
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // --- XỬ LÝ REALTIME (SOCKET.IO) ---

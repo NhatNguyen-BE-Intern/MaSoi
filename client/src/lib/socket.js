@@ -4,10 +4,13 @@ let socketInstance = null;
 
 export const getBackendUrl = () => {
   if (typeof window !== "undefined") {
-    // If the frontend is accessed from mobile via local IP (e.g. 192.168.1.15:3001),
-    // connect socket to that same IP on port 3000
-    const hostname = window.location.hostname;
-    return `http://${hostname}:3000`;
+    // If running Next.js dev server on port 3001, connect to backend on port 3000
+    if (window.location.port === "3001") {
+      const hostname = window.location.hostname;
+      return `http://${hostname}:3000`;
+    }
+    // When running in production (e.g. Render) where frontend is served by Express
+    return window.location.origin;
   }
   return "http://localhost:3000";
 };
