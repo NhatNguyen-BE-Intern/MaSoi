@@ -1,25 +1,25 @@
 {
-  "name": "masoi2",
+  "name": "masoi-monorepo",
   "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
+  "private": true,
+  "description": "Werewolf (Ma Sói) Game Monorepo - Backend, Frontend, Mobile",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
-    "client": "npm --prefix client run dev",
+    "start": "npm --prefix backend start",
+    "backend": "npm --prefix backend start",
+    "backend:dev": "npm --prefix backend run dev",
+    "frontend": "npm --prefix frontend run dev",
+    "frontend:build": "npm --prefix frontend run build",
     "mobile": "npm --prefix mobile start",
-    "mobile:tunnel": "npm --prefix mobile run tunnel",
-    "build": "npm --prefix client run build && node -e \"const fs=require('fs'); fs.cpSync('client/out', 'public', {recursive:true, force:true}); console.log('✅ Exported client to public successfully!');\""
+    "mobile:tunnel": "npm --prefix mobile run tunnel"
   },
-  "keywords": [],
+  "keywords": [
+    "werewolf",
+    "masoi",
+    "socket.io",
+    "nextjs",
+    "react-native",
+    "expo"
+  ],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "bcryptjs": "^3.0.3",
-    "cors": "^2.8.6",
-    "dotenv": "^17.3.1",
-    "express": "^5.2.1",
-    "mongoose": "^9.2.3",
-    "socket.io": "^4.8.3"
-  }
+  "license": "ISC"
 }
