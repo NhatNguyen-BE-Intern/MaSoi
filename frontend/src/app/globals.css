@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,700&family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
   --bg-primary: #07090e;
@@ -16,6 +16,8 @@
   --color-seer-glow: rgba(168, 85, 247, 0.4);
   --color-guard: #f59e0b;
   --color-guard-glow: rgba(245, 158, 11, 0.4);
+  --color-neutral: #38bdf8;
+  --color-neutral-glow: rgba(56, 189, 248, 0.4);
   --color-moderator: #ec4899;
 
   --gold-accent: #d4af37;
@@ -25,7 +27,7 @@
   --text-muted: #94a3b8;
   --text-dim: #64748b;
 
-  --font-heading: 'Cinzel', serif;
+  --font-heading: 'Playfair Display', Georgia, serif;
   --font-body: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
