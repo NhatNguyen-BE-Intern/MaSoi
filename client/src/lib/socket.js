@@ -7,12 +7,12 @@ export const getBackendUrl = () => {
     // If running Next.js dev server on port 3001, connect to backend on port 3000
     if (window.location.port === "3001") {
       const hostname = window.location.hostname;
-      return `http://${hostname}:3000`;
+      return `http://${hostname}:5000`;
     }
     // When running in production (e.g. Render) where frontend is served by Express
     return window.location.origin;
   }
-  return "http://localhost:3000";
+  return "http://localhost:5000";
 };
 
 export const getSocket = () => {

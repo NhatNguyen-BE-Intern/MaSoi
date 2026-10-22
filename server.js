@@ -511,6 +511,13 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("stop_discussion_timer", (data) => {
+    const roomCode = typeof data === "object" ? data.roomCode : data;
+    if (roomCode) {
+      io.to(roomCode).emit("timer_stopped");
+    }
+  });
+
   // 7. RỜI PHÒNG CHỦ ĐỘNG
   socket.on("leave_room", (roomCode) => {
     if (rooms[roomCode]) {

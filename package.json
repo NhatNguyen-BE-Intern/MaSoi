@@ -7,6 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
     "client": "npm --prefix client run dev",
+    "mobile": "npm --prefix mobile start",
+    "mobile:tunnel": "npm --prefix mobile run tunnel",
     "build": "npm --prefix client run build && node -e \"const fs=require('fs'); fs.cpSync('client/out', 'public', {recursive:true, force:true}); console.log('✅ Exported client to public successfully!');\""
   },
   "keywords": [],

@@ -1,6 +1,6 @@
 import path from "path";
 
-const backendUrl = process.env.BACKEND_URL || "http://localhost:3000";
+const backendUrl = process.env.BACKEND_URL || "http://localhost:5000";
 
 const isProd = process.env.NODE_ENV === "production";
 
