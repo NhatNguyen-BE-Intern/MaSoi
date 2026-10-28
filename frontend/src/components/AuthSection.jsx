@@ -8,6 +8,7 @@ import {
   RiArrowRightLine,
   RiShieldCheckLine,
 } from "react-icons/ri";
+import { getApiUrl } from "../lib/api";
 
 export default function AuthSection({ onAuthSuccess }) {
   const [tab, setTab] = useState("login"); // "login" | "register" | "character"
@@ -28,7 +29,7 @@ export default function AuthSection({ onAuthSuccess }) {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch(getApiUrl("/api/auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: username.trim(), password }),
@@ -62,7 +63,7 @@ export default function AuthSection({ onAuthSuccess }) {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/register", {
+      const res = await fetch(getApiUrl("/api/auth/register"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: username.trim(), password }),
@@ -91,19 +92,24 @@ export default function AuthSection({ onAuthSuccess }) {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/create-character", {
+      const res = await fetch(getApiUrl("/api/auth/create-character"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: currentUser?.id,
           characterName: characterName.trim(),
+          token: currentUser?.token,
         }),
       });
       const data = await res.json();
       if (!res.ok) {
         setErrorMsg(data.message || "Tạo tên nhân vật thất bại!");
       } else {
-        const updatedUser = { ...currentUser, characterName: data.characterName };
+        const updatedUser = {
+          ...currentUser,
+          characterName: data.characterName,
+          token: data.token || currentUser?.token,
+        };
         localStorage.setItem("user", JSON.stringify(updatedUser));
         onAuthSuccess(updatedUser);
       }

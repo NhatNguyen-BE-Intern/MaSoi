@@ -18,6 +18,8 @@ export default function Navbar({
   isConnected,
   currentRoomCode,
   onLeaveRoom,
+  onSwitchMode,
+  gameMode,
 }) {
   const [muted, setMuted] = useState(() => {
     if (typeof window !== "undefined") {
@@ -107,6 +109,21 @@ export default function Navbar({
                 }}
               />
               {isConnected ? "Máy chủ online" : "Mất kết nối"}
+              {gameMode && (
+                <span
+                  style={{
+                    marginLeft: "6px",
+                    background: gameMode === "online" ? "rgba(168, 85, 247, 0.2)" : "rgba(234, 179, 8, 0.2)",
+                    color: gameMode === "online" ? "#c084fc" : "#fde047",
+                    padding: "1px 6px",
+                    borderRadius: "6px",
+                    fontSize: "10px",
+                    fontWeight: "700",
+                  }}
+                >
+                  {gameMode === "online" ? "🌐 Online" : "🃏 Ngoài đời"}
+                </span>
+              )}
             </span>
           </div>
         </div>
@@ -160,6 +177,24 @@ export default function Navbar({
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           {user && (
             <>
+              {!currentRoomCode && onSwitchMode && (
+                <button
+                  onClick={onSwitchMode}
+                  className="btn-secondary"
+                  title="Đổi chế độ chơi"
+                  style={{
+                    width: "auto",
+                    padding: "8px 12px",
+                    fontSize: "12px",
+                    borderRadius: "10px",
+                    color: "#c084fc",
+                    borderColor: "rgba(168, 85, 247, 0.4)",
+                  }}
+                >
+                  🔄 Đổi Chế Độ
+                </button>
+              )}
+
               <button
                 onClick={onOpenFriends}
                 className="btn-secondary"

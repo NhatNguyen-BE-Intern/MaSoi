@@ -8,7 +8,9 @@ mobile/node_modules/
 .env
 .env*.local
 backend/.env
+frontend/.env
 frontend/.env*.local
+mobile/.env
 mobile/.env*.local
 
 # Next.js Build Output

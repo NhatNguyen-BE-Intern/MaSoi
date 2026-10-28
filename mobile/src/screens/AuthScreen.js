@@ -162,6 +162,7 @@ export default function AuthScreen({ onAuthSuccess, isNight = true }) {
         body: JSON.stringify({
           userId: currentUser?.id,
           characterName: characterName.trim(),
+          token: currentUser?.token,
         }),
       });
       const data = await res.json();
@@ -169,7 +170,11 @@ export default function AuthScreen({ onAuthSuccess, isNight = true }) {
       if (!res.ok) {
         setErrorMsg(data.message || 'Khắc tên nhân vật thất bại!');
       } else {
-        const updatedUser = { ...currentUser, characterName: data.characterName };
+        const updatedUser = {
+          ...currentUser,
+          characterName: data.characterName,
+          token: data.token || currentUser?.token,
+        };
         onAuthSuccess(updatedUser);
       }
     } catch (err) {

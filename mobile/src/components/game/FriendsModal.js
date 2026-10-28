@@ -86,6 +86,7 @@ export default function FriendsModal({ visible, onClose, user, isNight = true })
         body: JSON.stringify({
           myName: user.characterName,
           friendName: trimmed,
+          token: user?.token,
         }),
       });
       const data = await res.json();

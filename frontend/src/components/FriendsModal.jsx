@@ -2,34 +2,41 @@
 
 import React, { useState, useEffect } from "react";
 import { RiGroupLine, RiUserAddLine, RiCloseLine, RiCheckLine } from "react-icons/ri";
+import { getApiUrl } from "../lib/api";
 
 export default function FriendsModal({ isOpen, onClose, user }) {
   const [friends, setFriends] = useState([]);
   const [searchName, setSearchName] = useState("");
   const [loading, setLoading] = useState(false);
   const [statusMsg, setStatusMsg] = useState({ text: "", type: "" });
-
-  const loadFriends = async () => {
-    if (!user?.characterName) return;
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/friends/list/${encodeURIComponent(user.characterName)}`);
-      const data = await res.json();
-      if (res.ok && data.friends) {
-        setFriends(data.friends);
-      }
-    } catch (err) {
-      console.error("Lỗi tải bạn bè:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
-    if (isOpen && user?.characterName) {
-      loadFriends();
-    }
-  }, [isOpen, user]);
+    if (!isOpen || !user?.characterName) return;
+    let isCancelled = false;
+
+    const fetchFriends = async () => {
+      try {
+        const res = await fetch(
+          getApiUrl(`/api/friends/list/${encodeURIComponent(user.characterName)}`),
+        );
+        const data = await res.json();
+        if (!isCancelled && res.ok && data.friends) {
+          setFriends(data.friends);
+        }
+      } catch (err) {
+        console.error("Lỗi tải bạn bè:", err);
+      } finally {
+        if (!isCancelled) setLoading(false);
+      }
+    };
+
+    fetchFriends();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [isOpen, user?.characterName, refreshKey]);
 
   const handleAddFriend = async (e) => {
     e.preventDefault();
@@ -37,19 +44,20 @@ export default function FriendsModal({ isOpen, onClose, user }) {
 
     setStatusMsg({ text: "Đang gửi yêu cầu...", type: "info" });
     try {
-      const res = await fetch("/api/friends/add", {
+      const res = await fetch(getApiUrl("/api/friends/add"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           myName: user.characterName,
           friendName: searchName.trim(),
+          token: user?.token,
         }),
       });
       const data = await res.json();
       if (res.ok) {
         setStatusMsg({ text: data.message || "Kết bạn thành công!", type: "success" });
         setSearchName("");
-        await loadFriends();
+        setRefreshKey((k) => k + 1);
       } else {
         setStatusMsg({ text: data.message || "Không thể kết bạn!", type: "error" });
       }

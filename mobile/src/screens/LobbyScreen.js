@@ -22,7 +22,7 @@ import { CARD_IMAGES, BACKGROUND_IMAGES } from '../constants/cardAssets';
 import CustomButton from '../components/common/CustomButton';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const RUNE_SLOT_COUNT = 6;
+const RUNE_SLOT_COUNT = 4;
 
 /**
  * Màn hình Sảnh Chờ (LobbyScreen)

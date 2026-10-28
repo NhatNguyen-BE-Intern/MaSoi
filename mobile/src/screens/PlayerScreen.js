@@ -38,8 +38,12 @@ export default function PlayerScreen({
   isAlive = true,
   activeTimer = null,
   isNight = true,
+  isHost = false,
   onLeaveRoom,
   onPlayAgain,
+  onBroadcastSound,
+  onStartTimer,
+  onStopTimer,
   isPreview = false,
 }) {
   const theme = getTheme(isNight);
@@ -154,10 +158,19 @@ export default function PlayerScreen({
     activeRole.description ||
     'Ngủ say khi màn đêm buông xuống. Ban ngày cùng thảo luận tìm ra ma sói.';
 
+  const isLycanOrDoppel =
+    activeRole.code === 'LYCAN' ||
+    roleName.toLowerCase().includes('bán sói') ||
+    roleName.toLowerCase().includes('lycan') ||
+    activeRole.code === 'DOPPELGANGER' ||
+    roleName.toLowerCase().includes('hóa sói') ||
+    roleName.toLowerCase().includes('doppelganger');
+
   const isWolf =
-    roleTeam === 'Sói' ||
-    roleName.toLowerCase().includes('sói') ||
-    roleName.toLowerCase().includes('wolf');
+    !isLycanOrDoppel &&
+    (roleTeam === 'Sói' ||
+      roleName.toLowerCase().includes('sói') ||
+      roleName.toLowerCase().includes('wolf'));
   const isSeer =
     roleName.toLowerCase().includes('tiên tri') ||
     roleName.toLowerCase().includes('seer');
@@ -471,6 +484,75 @@ export default function PlayerScreen({
                 />
               )}
             </View>
+
+            {/* CÔNG CỤ CHỦ PHÒNG (CHO TRƯỜNG HỢP CHƠI KHÔNG CÓ QUẢN TRÒ RIÊNG) */}
+            {isHost && (
+              <View
+                style={{
+                  width: '100%',
+                  backgroundColor: 'rgba(21, 15, 30, 0.85)',
+                  borderWidth: 1,
+                  borderColor: 'rgba(212, 175, 55, 0.35)',
+                  borderRadius: shapes.radius,
+                  padding: 12,
+                  marginTop: 14,
+                }}
+              >
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                  <Text style={{ color: colors.gold, fontFamily: typography.fontBodyBold, fontSize: 12 }}>
+                    👑 CÔNG CỤ CHỦ PHÒNG
+                  </Text>
+                  <Text style={{ color: '#94a3b8', fontSize: 10 }}>Phát cho cả phòng</Text>
+                </View>
+
+                {/* Sound buttons */}
+                <View style={{ flexDirection: 'row', gap: 6, marginBottom: 10 }}>
+                  <TouchableOpacity
+                    style={[styles.roleChip, { flex: 1, alignItems: 'center', paddingVertical: 6 }]}
+                    onPress={() => onBroadcastSound?.({ roomCode, soundType: 'wolf' })}
+                  >
+                    <Text style={styles.roleChipText}>🐺 Sói Hú</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.roleChip, { flex: 1, alignItems: 'center', paddingVertical: 6 }]}
+                    onPress={() => onBroadcastSound?.({ roomCode, soundType: 'bell' })}
+                  >
+                    <Text style={styles.roleChipText}>🔔 Chuông Đêm</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.roleChip, { flex: 1, alignItems: 'center', paddingVertical: 6 }]}
+                    onPress={() => onBroadcastSound?.({ roomCode, soundType: 'morning' })}
+                  >
+                    <Text style={styles.roleChipText}>☀️ Trời Sáng</Text>
+                  </TouchableOpacity>
+                </View>
+
+                {/* Timer buttons */}
+                <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
+                  <Text style={{ color: '#94a3b8', fontSize: 11 }}>⏱️ Đếm giờ:</Text>
+                  <TouchableOpacity
+                    style={[styles.roleChip, { flex: 1, alignItems: 'center', paddingVertical: 5 }]}
+                    onPress={() => onStartTimer?.({ roomCode, seconds: 60, label: 'Thảo luận ban ngày' })}
+                  >
+                    <Text style={styles.roleChipText}>60s</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.roleChip, { flex: 1, alignItems: 'center', paddingVertical: 5 }]}
+                    onPress={() => onStartTimer?.({ roomCode, seconds: 120, label: 'Thảo luận ban ngày' })}
+                  >
+                    <Text style={styles.roleChipText}>120s</Text>
+                  </TouchableOpacity>
+                  {activeTimer ? (
+                    <TouchableOpacity
+                      style={[styles.roleChip, { flex: 1, alignItems: 'center', paddingVertical: 5, borderColor: '#ef4444' }]}
+                      onPress={() => onStopTimer?.({ roomCode })}
+                    >
+                      <Text style={[styles.roleChipText, { color: '#ef4444' }]}>Dừng</Text>
+                    </TouchableOpacity>
+                  ) : null}
+                </View>
+              </View>
+            )}
 
             {/* NÚT CHƠI VÁN MỚI (CHO CHẾ ĐỘ TỰ ĐỘNG HOẶC HẾT VÁN) */}
             {onPlayAgain ? (

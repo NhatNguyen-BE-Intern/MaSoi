@@ -24,6 +24,9 @@ export default function PlayerCardView({
   onLeaveRoom,
   activeTimer,
   isAlive = true,
+  onBroadcastSound,
+  onStartTimer,
+  onStopTimer,
 }) {
   const [isFlipped, setIsFlipped] = useState(false);
   const cardData =
@@ -412,10 +415,102 @@ export default function PlayerCardView({
         Hãy giữ bí mật thân phận với bạn bè ngồi cùng bàn!
       </p>
 
-      {/* Host Controls */}
+      {/* Host Controls & Soundboard (Hỗ trợ khi chơi không có Quản trò riêng) */}
+      {isHost && (
+        <div
+          className="glass-panel"
+          style={{
+            marginTop: "20px",
+            padding: "16px",
+            textAlign: "left",
+            border: "1px solid rgba(212, 175, 55, 0.25)",
+            background: "rgba(18, 11, 26, 0.6)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: "12px",
+            }}
+          >
+            <span style={{ fontSize: "13px", fontWeight: "bold", color: "var(--gold-accent)" }}>
+              👑 Công Cụ Chủ Phòng (Host Sound & Timer)
+            </span>
+            <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>Phát cho cả phòng</span>
+          </div>
+
+          {/* Soundboard Buttons */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", marginBottom: "12px" }}>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => onBroadcastSound?.({ roomCode, soundType: "wolf" })}
+              style={{ padding: "8px", fontSize: "12px" }}
+              title="Phát tiếng sói hú cho cả phòng"
+            >
+              🐺 Sói Hú
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => onBroadcastSound?.({ roomCode, soundType: "bell" })}
+              style={{ padding: "8px", fontSize: "12px" }}
+              title="Phát tiếng chuông đêm"
+            >
+              🔔 Đêm Xuống
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => onBroadcastSound?.({ roomCode, soundType: "morning" })}
+              style={{ padding: "8px", fontSize: "12px" }}
+              title="Phát tiếng gà gáy / chuông sáng"
+            >
+              ☀️ Trời Sáng
+            </button>
+          </div>
+
+          {/* Timer Buttons */}
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <span style={{ fontSize: "12px", color: "var(--text-dim)", whiteSpace: "nowrap" }}>
+              ⏱️ Thảo luận:
+            </span>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => onStartTimer?.({ roomCode, seconds: 60, label: "Thảo luận ban ngày" })}
+              style={{ padding: "6px 10px", fontSize: "12px", flex: 1 }}
+            >
+              60s
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => onStartTimer?.({ roomCode, seconds: 120, label: "Thảo luận ban ngày" })}
+              style={{ padding: "6px 10px", fontSize: "12px", flex: 1 }}
+            >
+              120s
+            </button>
+            {activeTimer && (
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => onStopTimer?.({ roomCode })}
+                style={{ padding: "6px 10px", fontSize: "12px", color: "#ef4444" }}
+              >
+                ⏹️ Dừng
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Room Actions */}
       <div
         style={{
-          marginTop: "28px",
+          marginTop: "20px",
           paddingTop: "16px",
           borderTop: "1px solid var(--border-glass)",
           display: "flex",

@@ -1,33 +1,36 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import { GiSpellBook, GiWolfHead, GiFarmer, GiDramaMasks } from "react-icons/gi";
 import { RiCloseLine } from "react-icons/ri";
+import { getApiUrl } from "../lib/api";
 
 export default function CardDictionaryModal({ isOpen, onClose }) {
   const [cards, setCards] = useState([]);
   const [activeTab, setActiveTab] = useState("all");
   const [loading, setLoading] = useState(false);
 
-  const loadCards = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/cards");
-      const data = await res.json();
-      if (res.ok && Array.isArray(data)) {
-        setCards(data);
-      }
-    } catch (err) {
-      console.error("Lỗi lấy danh sách bài:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    if (isOpen) {
-      loadCards();
-    }
+    if (!isOpen) return;
+    let isCancelled = false;
+
+    const loadCards = async () => {
+      try {
+        const res = await fetch(getApiUrl("/api/cards"));
+        const data = await res.json();
+        if (!isCancelled && res.ok && Array.isArray(data)) {
+          setCards(data);
+        }
+      } catch (err) {
+        console.error("Lỗi lấy danh sách bài:", err);
+      } finally {
+        if (!isCancelled) setLoading(false);
+      }
+    };
+
+    loadCards();
+
+    return () => {
+      isCancelled = true;
+    };
   }, [isOpen]);
 
   const getRoleImage = (cardName, team) => {

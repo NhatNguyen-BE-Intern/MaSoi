@@ -9,8 +9,8 @@ const userSchema = new mongoose.Schema({
     sparse: true,
     trim: true,
   },
-  // Đã sửa lại thành String để lưu tên nhân vật của bạn bè cho đơn giản
   friends: [{ type: String }],
+  sessionToken: { type: String },
 });
 
 module.exports = mongoose.model("User", userSchema);

@@ -5,6 +5,7 @@
 
 export const CARD_IMAGES = {
   back: require('../../assets/cards/card_back.jpg'),
+  BACK_GOTHIC: require('../../assets/cards/card_back.jpg'),
   werewolf: require('../../assets/cards/werewolf.jpg'),
   seer: require('../../assets/cards/seer.jpg'),
   guard: require('../../assets/cards/guard.jpg'),
@@ -24,6 +25,15 @@ export const BACKGROUND_IMAGES = {
 export const getCardArtwork = (roleName = '', team = '') => {
   const normalized = (roleName || '').toLowerCase().trim();
   const normalizedTeam = (team || '').toLowerCase().trim();
+
+  if (
+    normalized.includes('bán sói') ||
+    normalized.includes('lycan') ||
+    normalized.includes('hóa sói') ||
+    normalized.includes('doppelganger')
+  ) {
+    return CARD_IMAGES.villager;
+  }
 
   if (normalized.includes('sói') || normalized.includes('wolf') || normalizedTeam === 'sói') {
     return CARD_IMAGES.werewolf;

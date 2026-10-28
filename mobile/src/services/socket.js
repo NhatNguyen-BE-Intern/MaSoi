@@ -14,7 +14,7 @@ let socketInstance = null;
 export const getSocket = () => {
   if (!socketInstance) {
     socketInstance = io(SOCKET_URL, {
-      transports: ['websocket'], // Mobile ưu tiên websocket trực tiếp để kết nối nhanh và ổn định nhất
+      transports: ['websocket', 'polling'], // Ưu tiên websocket và fallback polling để chống lỗi kết nối mạng di động/tunnel
       autoConnect: true,
       reconnection: true,
       reconnectionAttempts: 10,

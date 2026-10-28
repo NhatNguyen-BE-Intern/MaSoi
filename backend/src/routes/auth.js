@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 const User = require("../models/User");
 
 // --- 1. API ĐĂNG KÝ TÀI KHOẢN ---
@@ -93,13 +94,19 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Sai mật khẩu!" });
     }
 
-    // Đăng nhập thành công, trả về thông tin user
+    // Tạo session token bảo mật phiên làm việc
+    const sessionToken = crypto.randomUUID();
+    user.sessionToken = sessionToken;
+    await user.save();
+
+    // Đăng nhập thành công, trả về thông tin user kèm token
     res.status(200).json({
       message: "Đăng nhập thành công!",
       user: {
         id: user._id,
         username: user.username,
         characterName: user.characterName || undefined,
+        token: sessionToken,
       },
     });
   } catch (error) {
@@ -110,7 +117,7 @@ router.post("/login", async (req, res) => {
 // --- 3. API TẠO TÊN NHÂN VẬT ---
 router.post("/create-character", async (req, res) => {
   try {
-    const { userId, characterName } = req.body;
+    const { userId, characterName, token } = req.body;
 
     if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ message: "Mã người dùng không hợp lệ!" });
@@ -131,28 +138,44 @@ router.post("/create-character", async (req, res) => {
         .json({ message: "Tên nhân vật phải từ 2 đến 25 ký tự!" });
     }
 
-    // Kiểm tra xem tên nhân vật này có ai lấy chưa
-    const existingCharacter = await User.findOne({ characterName: cleanName });
+    function escapeRegex(text) {
+      return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+    }
+
+    // Kiểm tra xem tên nhân vật này có ai lấy chưa (không phân biệt hoa/thường)
+    const existingCharacter = await User.findOne({
+      characterName: { $regex: new RegExp(`^${escapeRegex(cleanName)}$`, "i") },
+    });
     if (existingCharacter) {
       return res.status(400).json({
         message: "Tên nhân vật này đã có người lấy, vui lòng chọn tên khác!",
       });
     }
 
-    // Tìm user và cập nhật tên nhân vật
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { characterName: cleanName },
-      { new: true }, // Trả về data mới sau khi update
-    );
-
+    // Tìm user và kiểm tra xem đã có tên nhân vật chưa
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "Không tìm thấy người dùng!" });
     }
 
+    if (!token || !user.sessionToken || user.sessionToken !== token) {
+      return res.status(403).json({ message: "Phiên làm việc không hợp lệ hoặc đã hết hạn! Vui lòng đăng nhập lại." });
+    }
+
+    if (user.characterName) {
+      return res.status(400).json({
+        message: "Tài khoản của bạn đã được gắn tên nhân vật trước đó!",
+        characterName: user.characterName,
+      });
+    }
+
+    user.characterName = cleanName;
+    await user.save();
+
     res.status(200).json({
       message: "Tạo tên nhân vật thành công!",
       characterName: user.characterName,
+      token: user.sessionToken,
     });
   } catch (error) {
     if (error.code === 11000) {

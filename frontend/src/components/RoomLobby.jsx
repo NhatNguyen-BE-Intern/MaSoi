@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   GiCrown,
   GiDramaMasks,
@@ -18,6 +18,7 @@ import {
   RiEditLine,
   RiCloseLine,
 } from "react-icons/ri";
+import { getApiUrl } from "../lib/api";
 
 export default function RoomLobby({
   roomCode,
@@ -34,25 +35,32 @@ export default function RoomLobby({
   const [allCards, setAllCards] = useState([]);
   const [customDeck, setCustomDeck] = useState({});
 
-  const loadCardList = async () => {
-    try {
-      const res = await fetch("/api/cards");
-      const data = await res.json();
-      if (res.ok && Array.isArray(data)) {
-        setAllCards(data);
-        const initDeck = {};
-        data.forEach((c) => (initDeck[c._id] = 0));
-        setCustomDeck(initDeck);
-      }
-    } catch (err) {
-      console.error("Lỗi lấy danh sách bài:", err);
-    }
-  };
-
   useEffect(() => {
-    if (isHost) {
-      loadCardList();
-    }
+    if (!isHost) return;
+    let isCancelled = false;
+
+    const fetchCards = async () => {
+      try {
+        const res = await fetch(getApiUrl("/api/cards"));
+        const data = await res.json();
+        if (!isCancelled && res.ok && Array.isArray(data)) {
+          setAllCards(data);
+          const initDeck = {};
+          data.forEach((c) => {
+            initDeck[c._id] = 0;
+          });
+          setCustomDeck(initDeck);
+        }
+      } catch (err) {
+        console.error("Lỗi lấy danh sách bài:", err);
+      }
+    };
+
+    fetchCards();
+
+    return () => {
+      isCancelled = true;
+    };
   }, [isHost]);
 
   const effectiveModeratorId =
